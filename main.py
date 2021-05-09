@@ -29,9 +29,9 @@ async def parse():
     if first_time is None or first_time < sorted_times[0]:
         first_time = sorted_times[0]
         await bot.send_message("466455737", text)
-    else:
-        print(first_time < sorted_times[0])
-        print(first_time == sorted_times[0])
+    elif sorted_times[0] > first_time:
+        first_time = sorted_times[0]
+        await bot.send_message("466455737", text)
 
 
 if __name__ == '__main__':
