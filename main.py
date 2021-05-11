@@ -35,7 +35,7 @@ async def parse():
         await bot.send_message("466455737", "Новое время")
         first_time = sorted_times[0]
         await bot.send_message("466455737", text)
-    elif sorted_times[0] > first_time:
+    elif sorted_times[0] < first_time:
         first_time = sorted_times[0]
         await bot.send_message("466455737", "Время пропало")
         await bot.send_message("466455737", text)
