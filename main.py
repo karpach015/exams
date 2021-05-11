@@ -21,7 +21,12 @@ async def parse():
     url = "https://eteenindus.mnt.ee/public/vabadSoidueksamiajad.xhtml"
     response = requests.get(url)
     html = Bs(response.content, 'html.parser')
-    times = {elem.select(".eksam-ajad-byroo span")[0].text: elem.select(".eksam-ajad-aeg")[0].text for elem in html.select("table tbody")[0]}
+
+    try:
+        times = {elem.select(".eksam-ajad-byroo span")[0].text: elem.select(".eksam-ajad-aeg")[0].text for elem in html.select("table tbody")[0]}
+    except IndexError:
+        return None
+
     sorted_times = sorted(times.items(), key=lambda x: datetime.strptime(x[1], "%d.%m.%Y %H:%M"))
     text = "\n".join([f"{time[0]}: {time[1]}" for time in sorted_times])
 
