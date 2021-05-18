@@ -27,17 +27,19 @@ async def parse():
     except IndexError:
         return None
 
+    times = {'Tallinn': times.get('Tallinn')}
     sorted_times = sorted(times.items(), key=lambda x: datetime.strptime(x[1], "%d.%m.%Y %H:%M"))
+
     text = "\n".join([f"{time[0]}: {time[1]}" for time in sorted_times])
 
     global first_time
-    if first_time is None or first_time < sorted_times[0]:
-        await bot.send_message("466455737", "Время пропало")
-        first_time = sorted_times[0]
-        await bot.send_message("466455737", text)
-    elif sorted_times[0] < first_time:
+    if first_time is None or sorted_times[0] < first_time:
         first_time = sorted_times[0]
         await bot.send_message("466455737", "Новое время")
+        await bot.send_message("466455737", text)
+    elif first_time < sorted_times[0]:
+        await bot.send_message("466455737", "Время пропало")
+        first_time = sorted_times[0]
         await bot.send_message("466455737", text)
 
 
