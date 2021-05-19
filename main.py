@@ -45,5 +45,5 @@ async def parse():
 
 if __name__ == '__main__':
     loop = asyncio.get_event_loop()
-    loop.create_task(main_loop(2))
+    loop.create_task(main_loop(30))
     executor.start_polling(dp, skip_updates=True)
