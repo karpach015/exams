@@ -9,6 +9,24 @@ bot = Bot(token=config.API_TOKEN)
 dp = Dispatcher(bot)
 
 first_time = None
+date_from = datetime.fromtimestamp(0)
+
+
+@dp.message_handler(commands="from")
+async def search_date_from(msg: types.Message):
+    date_str = msg.text.split("from ")[1]
+    try:
+        date = datetime.strptime(date_str, "%d.%m.%Y")
+    except ValueError:
+        date = datetime.strptime(date_str, "%d.%m.%y")
+
+    change_date_from(date)
+    await msg.answer(f"Поиск времён начиная с {date_from}")
+
+
+def change_date_from(date: datetime):
+    global date_from
+    date_from = date
 
 
 async def main_loop(wait_time: int):
@@ -33,11 +51,16 @@ async def parse():
     text = "\n".join([f"{time[0]}: {time[1]}" for time in sorted_times])
 
     global first_time
-    if first_time is None or sorted_times[0] < first_time:
+    global date_from
+    if first_time is None:
+        first_time = sorted_times[0]
+        await bot.send_message("466455737", "Бот перезапустился\nВсе фильтры сброшенны!")
+        await bot.send_message("466455737", text)
+    elif date_from > sorted_times[0] < first_time:
         first_time = sorted_times[0]
         await bot.send_message("466455737", "Новое время")
         await bot.send_message("466455737", text)
-    elif first_time < sorted_times[0]:
+    elif date_from < first_time < sorted_times[0]:
         await bot.send_message("466455737", "Время пропало")
         first_time = sorted_times[0]
         await bot.send_message("466455737", text)
