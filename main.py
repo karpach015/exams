@@ -9,7 +9,20 @@ import callback, keyboards
 bot = Bot(token=config.API_TOKEN)
 dp = Dispatcher(bot)
 
-first_time = None
+first_time_dict = {
+    "Haapsalu": None,
+    "Jõhvi": None,
+    "Kuressaare": None,
+    "Narva": None,
+    "Paide": None,
+    "Pärnu": None,
+    "Rakvere": None,
+    "Rapla": None,
+    "Tallinn": None,
+    "Tartu": None,
+    "Viljandi": None,
+    "Võru": None
+}
 before_date = datetime.now() + timedelta(days=365)
 
 
@@ -35,13 +48,16 @@ async def change_settings(msg: types.Message):
 @dp.message_handler(commands="before")
 async def search_date_from(msg: types.Message):
     date_str = msg.text.split("before ")[1]
-    try:
-        date = datetime.strptime(date_str, "%d.%m.%Y")
-    except ValueError:
+    if len(date_str) == 8:
         date = datetime.strptime(date_str, "%d.%m.%y")
+    elif len(date_str) == 10:
+        date = datetime.strptime(date_str, "%d.%m.%Y")
+    elif len(date_str) == 5:
+        day_month = datetime.strptime(date_str, "%d.%m")
+        date = datetime(year=datetime.today().year, month=day_month.month, day=day_month.day)
 
     change_before_date(date)
-    await msg.answer(f"Поиск времён начиная с {before_date}")
+    await msg.answer(f"Поиск времён начиная с {before_date.strftime('%d.%m.%Y')}")
 
 
 def change_before_date(date: datetime):
@@ -50,6 +66,7 @@ def change_before_date(date: datetime):
 
 
 async def main_loop(wait_time: int):
+    await bot.send_message("466455737", "Бот перезапустился!")
     while True:
         await asyncio.sleep(wait_time)
         await parse()
@@ -65,31 +82,29 @@ async def parse():
     except IndexError:
         return None
 
-    if config.test:
-        times = {"Tallinn": datetime.strptime('31.05.2021 10:00', '%d.%m.%Y %H:%M')}
-
-    sorted_times = sorted(times.items(), key=lambda x: x)
-    sorted_times = [(x[0], x[1]) for x in sorted_times if config.settings[x[0]]]
-
-    text = "\n".join([f"{time[0]}: {time[1].strftime('%d.%m.%Y %H:%M')}" for time in sorted_times])
-
-    global first_time
+    global first_time_dict
     global before_date
+    for location, time in times.items():
+        if not config.settings[location]:
+            continue
 
-    if first_time is None:
-        first_time = sorted_times[0][1]
-        await bot.send_message("466455737", "Бот перезапустился\nВсе фильтры сброшенны!")
-        await bot.send_message("466455737", text)
-    elif before_date > sorted_times[0][1] < first_time:
-        first_time = sorted_times[0][1]
-        await bot.send_message("466455737", "Новое время")
-        await bot.send_message("466455737", text)
-    elif before_date > first_time < sorted_times[0][1]:
-        first_time = sorted_times[0][1]
-        await bot.send_message("466455737", "Время пропало")
-        await bot.send_message("466455737", text)
+        first_time = first_time_dict[location]
+        text = f"{location}: {time.strftime('%d.%m.%y %H:%M')}"
+
+        if first_time is None:
+            first_time_dict[location] = time
+            await bot.send_message("466455737", text)
+        elif before_date > time < first_time:
+            first_time_dict[location] = time
+            await bot.send_message("466455737", "Новое время")
+            await bot.send_message("466455737", text)
+        elif before_date > first_time < time:
+            first_time_dict[location] = time
+            await bot.send_message("466455737", "Время пропало")
+            await bot.send_message("466455737", text)
+
 
 if __name__ == '__main__':
     loop = asyncio.get_event_loop()
-    loop.create_task(main_loop(30))
+    loop.create_task(main_loop(3))
     executor.start_polling(dp, skip_updates=True)

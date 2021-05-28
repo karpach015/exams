@@ -14,5 +14,3 @@ settings = {
     "Viljandi": False,
     "Võru": False
 }
-
-test = False
