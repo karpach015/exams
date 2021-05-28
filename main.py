@@ -13,14 +13,6 @@ first_time = None
 before_date = datetime.now() + timedelta(days=365)
 
 
-@dp.message_handler(commands="test")
-async def test(msg):
-    if config.test:
-        config.test = False
-    else:
-        config.test = True
-
-
 @dp.callback_query_handler(callback.search_settings.filter())
 async def change_location_settings(call: types.CallbackQuery):
     location = call.data.split(':')[1]
@@ -40,19 +32,19 @@ async def change_settings(msg: types.Message):
     await msg.answer("Выбери места для поиска", reply_markup=keyboards.get_select_location_kb())
 
 
-@dp.message_handler(commands="from")
+@dp.message_handler(commands="before")
 async def search_date_from(msg: types.Message):
-    date_str = msg.text.split("from ")[1]
+    date_str = msg.text.split("before ")[1]
     try:
         date = datetime.strptime(date_str, "%d.%m.%Y")
     except ValueError:
         date = datetime.strptime(date_str, "%d.%m.%y")
 
-    change_date_from(date)
+    change_before_date(date)
     await msg.answer(f"Поиск времён начиная с {before_date}")
 
 
-def change_date_from(date: datetime):
+def change_before_date(date: datetime):
     global before_date
     before_date = date
 
