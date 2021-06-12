@@ -24,7 +24,7 @@ first_time_dict = {
     "Võru": None
 }
 # before_date = datetime.now() + timedelta(days=365)
-before_date = datetime.strptime("26.06.2021", "%d.%m.%y")
+before_date = datetime.strptime("26.06.2021", "%d.%m.%Y")
 
 
 @dp.callback_query_handler(callback.search_settings.filter())
