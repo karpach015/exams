@@ -23,7 +23,8 @@ first_time_dict = {
     "Viljandi": None,
     "Võru": None
 }
-before_date = datetime.now() + timedelta(days=365)
+# before_date = datetime.now() + timedelta(days=365)
+before_date = datetime.strptime("26.06.2021", "%d.%m.%y")
 
 
 @dp.callback_query_handler(callback.search_settings.filter())
@@ -57,7 +58,7 @@ async def search_date_from(msg: types.Message):
         date = datetime(year=datetime.today().year, month=day_month.month, day=day_month.day)
 
     change_before_date(date)
-    await msg.answer(f"Поиск времён начиная с {before_date.strftime('%d.%m.%Y')}")
+    await msg.answer(f"Поиск времён до {before_date.strftime('%d.%m.%Y')}")
 
 
 def change_before_date(date: datetime):
@@ -85,8 +86,12 @@ async def parse():
     global first_time_dict
     global before_date
     for location, time in times.items():
-        if not config.settings[location]:
-            continue
+        if location in config.settings:
+            if not config.settings[location]:
+                continue
+            else:
+                await bot.send_message("466455737", f"{location}: {time.strftime('%d.%m.%y %H:%M')}")
+                continue
 
         first_time = first_time_dict[location]
         text = f"{location}: {time.strftime('%d.%m.%y %H:%M')}"
