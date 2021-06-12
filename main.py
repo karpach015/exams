@@ -69,6 +69,7 @@ def change_before_date(date: datetime):
 
 async def main_loop(wait_time: int):
     await bot.send_message("466455737", "Бот перезапустился!")
+    await bot.send_message("466455737", f"Поиск времён до {before_date.strftime('%d.%m.%Y')}")
     while True:
         await asyncio.sleep(wait_time)
         await parse()
