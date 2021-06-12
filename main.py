@@ -23,8 +23,7 @@ first_time_dict = {
     "Viljandi": None,
     "Võru": None
 }
-# before_date = datetime.now() + timedelta(days=365)
-before_date = datetime.strptime("26.06.2021", "%d.%m.%Y")
+before_date = datetime.now() + timedelta(days=365)
 
 
 @dp.callback_query_handler(callback.search_settings.filter())
@@ -112,4 +111,5 @@ async def parse():
 if __name__ == '__main__':
     loop = asyncio.get_event_loop()
     loop.create_task(main_loop(3))
+    search_date_from("/before 26.06")
     executor.start_polling(dp, skip_updates=True)
