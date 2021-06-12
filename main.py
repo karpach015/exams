@@ -4,7 +4,8 @@ import requests
 from bs4 import BeautifulSoup as Bs
 from aiogram import Bot, Dispatcher, executor, types
 from datetime import datetime, timedelta
-import callback, keyboards
+import callback
+import keyboards
 
 bot = Bot(token=config.API_TOKEN)
 dp = Dispatcher(bot)
@@ -23,7 +24,8 @@ first_time_dict = {
     "Viljandi": None,
     "Võru": None
 }
-before_date = datetime.now() + timedelta(days=365)
+# before_date = datetime.now() + timedelta(days=365)
+before_date = datetime.strptime("26.01.21", "%d.%m.%y")
 
 
 @dp.callback_query_handler(callback.search_settings.filter())
@@ -78,7 +80,10 @@ async def parse():
     html = Bs(response.content, 'html.parser')
 
     try:
-        times = {elem.select(".eksam-ajad-byroo span")[0].text: datetime.strptime(elem.select(".eksam-ajad-aeg")[0].text, "%d.%m.%Y %H:%M") for elem in html.select("table tbody")[0]}
+        times = {
+            elem.select(".eksam-ajad-byroo span")[0].text: datetime.strptime(elem.select(".eksam-ajad-aeg")[0].text,
+                                                                             "%d.%m.%Y %H:%M") for elem in
+            html.select("table tbody")[0]}
     except IndexError:
         return None
 
@@ -88,9 +93,9 @@ async def parse():
         if location in config.settings:
             if not config.settings[location]:
                 continue
-            else:
-                await bot.send_message("466455737", f"{location}: {time.strftime('%d.%m.%y %H:%M')}")
-                continue
+        else:
+            await bot.send_message("466455737", f"{location}: {time.strftime('%d.%m.%y %H:%M')}")
+            continue
 
         first_time = first_time_dict[location]
         text = f"{location}: {time.strftime('%d.%m.%y %H:%M')}"
@@ -111,5 +116,4 @@ async def parse():
 if __name__ == '__main__':
     loop = asyncio.get_event_loop()
     loop.create_task(main_loop(3))
-    search_date_from("/before 26.06")
     executor.start_polling(dp, skip_updates=True)
