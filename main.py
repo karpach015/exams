@@ -77,7 +77,10 @@ async def main_loop(wait_time: int):
 
 async def parse():
     url = "https://eteenindus.mnt.ee/public/vabadSoidueksamiajad.xhtml"
-    response = requests.get(url)
+    try:
+        response = requests.get(url)
+    except:
+        return None
     html = Bs(response.content, 'html.parser')
 
     try:
