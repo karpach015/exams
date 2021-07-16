@@ -5,12 +5,12 @@ settings = {
     "Jõhvi": False,
     "Kuressaare": False,
     "Narva": False,
-    "Paide": False,
-    "Pärnu": False,
+    "Paide": True,
+    "Pärnu": True,
     "Rakvere": False,
     "Rapla": False,
     "Tallinn": True,
-    "Tartu": False,
+    "Tartu": True,
     "Viljandi": False,
     "Võru": False
 }
